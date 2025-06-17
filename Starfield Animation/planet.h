@@ -2,9 +2,11 @@
 
 #include <math.h>
 #include <SDL.h>
+#include "sun.h"
 
 #define WIDTH 800
 #define HEIGHT 600
+#define COLOR_SUN 0xFFFFCC88
 
 class Planet
 {
@@ -84,10 +86,50 @@ private:
 				int dy = radius - h;
 				if ((dx * dx + dy * dy) <= (radius * radius))
 				{
-					SDL_Rect rect = { WIDTH / 2 + centerX + dx, HEIGHT / 2 + centerY + dy, 1, 1 };
-					SDL_FillRect(surface, &rect, color);
+					double pixelX = centerX + dx;
+					double pixelY = centerY + dy;
+
+					SDL_Rect rect = { WIDTH / 2 + pixelX, HEIGHT / 2 + pixelY, 1, 1 };
+
+					double distancePixelSunSquared = (Sun::posX - pixelX) * (Sun::posX - pixelX) + (Sun::posY - pixelY) * (Sun::posY - pixelY);
+					double distanceCenterSunSquared = (Sun::posX - centerX) * (Sun::posX - centerX) + (Sun::posY - centerY) * (Sun::posY - centerY);
+					if (distancePixelSunSquared < distanceCenterSunSquared)
+					{
+						double distanceToCenterNormalized = sqrt((centerX - pixelX) * (centerX - pixelX) + (centerY - pixelY) * (centerY - pixelY)) / radius;
+
+						Uint32 colorN = InterpolateColor(color, COLOR_SUN, distanceToCenterNormalized);
+
+						SDL_FillRect(surface, &rect, colorN);
+					}
+					else
+					{
+						SDL_FillRect(surface, &rect, color);
+					}
 				}
 			}
 		}
+	}
+
+	Uint32 InterpolateColor(Uint32 color1, Uint32 color2, double t)
+	{
+		if (t < 0.0) t = 0.0;
+		if (t > 1.0) t = 1.0;
+
+		Uint8 a1 = (color1 >> 24) & 0xFF;
+		Uint8 r1 = (color1 >> 16) & 0xFF;
+		Uint8 g1 = (color1 >> 8) & 0xFF;
+		Uint8 b1 = (color1 >> 0) & 0xFF;
+
+		Uint8 a2 = (color2 >> 24) & 0xFF;
+		Uint8 r2 = (color2 >> 16) & 0xFF;
+		Uint8 g2 = (color2 >> 8) & 0xFF;
+		Uint8 b2 = (color2 >> 0) & 0xFF;
+
+		Uint8 a = (Uint8)((1.0 - t) * a1 + t * a2);
+		Uint8 r = (Uint8)((1.0 - t) * r1 + t * r2);
+		Uint8 g = (Uint8)((1.0 - t) * g1 + t * g2);
+		Uint8 b = (Uint8)((1.0 - t) * b1 + t * b2);
+
+		return (a << 24) | (r << 16) | (g << 8) | b;
 	}
 };

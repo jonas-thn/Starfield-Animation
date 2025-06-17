@@ -8,8 +8,10 @@
 
 // alpha, r, g, b
 #define COLOR_WHITE 0xFFFFFFFF
+#define COLOR_BROWN 0xFFA52A2A
 #define COLOR_BLUE 0xFF0000FF
 #define COLOR_ORANGE 0xFFFFAA00
+
 #define WIDTH 800
 #define HEIGHT 600
 #define STAR_COUNT 1000
@@ -23,14 +25,6 @@ typedef struct
 	double speedFactor;
 	double distance;
 } Star;
-//
-//typedef struct
-//{
-//	double x, y;
-//	double vx, vy;
-//	double speedFactor;
-//	double distance;
-//} Planet;
 
 int ClampInt(int value, int min, int max);
 double Clamp(double value, double min, double max);
@@ -130,7 +124,7 @@ int main(int argc, char* argv[])
 	int aimY = 0;
 
 	Sun::Create(0, 0, COLOR_ORANGE, 100, 0.01);
-	Planet white = Planet(0.2, 10, 200, -300, -250, surface, COLOR_WHITE);
+	Planet brown = Planet(0.2, 10, 200, -300, -250, surface, COLOR_BROWN);
 	Planet blue = Planet(0.05, 1, 200, -50, 0, surface, COLOR_BLUE);
 
 	for (int i = 0; i < STAR_COUNT; i++)
@@ -236,7 +230,7 @@ int main(int argc, char* argv[])
 
 		Sun::Draw(aimX, aimY, surface);
 		blue.Draw(aimX, aimY);
-		white.Draw(aimX, aimY);
+		brown.Draw(aimX, aimY);
 		printf("AimX: %d, AimY: %d\n", aimX, aimY);
 
 		SDL_UpdateWindowSurface(window);
