@@ -3,8 +3,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include "planet.h"
 
 #define COLOR_WHITE 0xFFFFFFFF
+#define COLOR_ORANGE 0xFFFF00FF
+#define COLOR_BLUE 0x0000FFFF
 #define WIDTH 800
 #define HEIGHT 600
 #define STAR_COUNT 1000
@@ -18,22 +21,21 @@ typedef struct
 	double speedFactor;
 	double distance;
 } Star;
+//
+//typedef struct
+//{
+//	double x, y;
+//	double vx, vy;
+//	double speedFactor;
+//	double distance;
+//} Planet;
 
-typedef struct
+int ClampInt(int value, int min, int max);
+double Clamp(double value, double min, double max);
+
+int IsNear(double a, double b, double epsilon)
 {
-	double x, y;
-	double vx, vy;
-	double speedFactor;
-	double distance;
-} Planet;
-
-
-
-void Bezier2D(double t, double x0, double y0, double cx, double cy, double x1, double y1, double* outX, double* outY)
-{
-	double u = 1 - t;
-	*outX = u * u * x0 + 2 * u * t * cx + t * t * x1;
-	*outY = u * u * y0 + 2 * u * t * cy + t * t * y1;
+	return fabs(a - b) < epsilon;
 }
 
 void RandomPositionOnEdge(int& pointX, int& pointY)
@@ -122,16 +124,25 @@ int main(int argc, char* argv[])
 
 	int is_running = 1;
 	Star stars[STAR_COUNT];
-	int mouseX = 0;
-	int mouseY = 0;
+	int aimX = 0;
+	int aimY = 0;
+
+	Planet orange = Planet(0.1, 5, 200, 200, 200, surface, COLOR_ORANGE);
+	Planet white = Planet(0.2, 10, 200, -300, -250, surface, COLOR_WHITE);
+	Planet blue = Planet(0.05, 1, 200, -50, 0, surface, COLOR_BLUE);
 
 	for (int i = 0; i < STAR_COUNT; i++)
 	{
-		stars[i] = NewStar(mouseX, mouseY);
+		stars[i] = NewStar(aimX, aimY);
 	}
 
 	while(is_running)
 	{
+		static int left = 0;
+		static int right = 0;
+		static int top = 0;
+		static int bottom = 0;
+
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -142,17 +153,74 @@ int main(int argc, char* argv[])
 
 			if(event.type == SDL_MOUSEMOTION)
 			{
-				mouseX = ClampInt(event.motion.x, 0, WIDTH) - WIDTH / 2;
-				mouseY = ClampInt(event.motion.y, 0, HEIGHT) - HEIGHT / 2;
+				/*mouseX = ClampInt(event.motion.x, 0, WIDTH) - WIDTH / 2;
+				mouseY = ClampInt(event.motion.y, 0, HEIGHT) - HEIGHT / 2;*/
 			}
 
-			
+			if (event.type == SDL_KEYDOWN)
+			{
+				if(event.key.keysym.sym == SDLK_ESCAPE)
+				{
+					is_running = 0;
+				}
+
+				if (event.key.keysym.sym == SDLK_w)
+				{
+					top = 1;
+				}
+				if (event.key.keysym.sym == SDLK_s)
+				{
+					bottom = 1;
+				}
+				if (event.key.keysym.sym == SDLK_a)
+				{
+					left = 1;
+				}
+				if (event.key.keysym.sym == SDLK_d)
+				{
+					right = 1;
+				}
+			}
+
+			if (event.type == SDL_KEYUP)
+			{
+				if (event.key.keysym.sym == SDLK_ESCAPE)
+				{
+					is_running = 0;
+				}
+
+				if (event.key.keysym.sym == SDLK_w)
+				{
+					top = 0;
+				}
+				if (event.key.keysym.sym == SDLK_s)
+				{
+					bottom = 0;
+				}
+				if (event.key.keysym.sym == SDLK_a)
+				{
+					left = 0;
+				}
+				if (event.key.keysym.sym == SDLK_d)
+				{
+					right = 0;
+				}
+			}
 		}
+
+		int aimSpeed = 3;
+
+		aimY -= (top - bottom) * aimSpeed;
+		aimX -= (left - right) * aimSpeed;
+
+		int aimOffset = 25;
+		aimX = ClampInt(aimX, -WIDTH / 2 + aimOffset, WIDTH / 2 - aimOffset);
+		aimY = ClampInt(aimY, -HEIGHT / 2, HEIGHT / 2);
 
 		SDL_FillRect(surface, NULL, 0x00000000);
 
 
-		Update(surface, stars, mouseX, mouseY);
+		Update(surface, stars, aimX, aimY);
 
 		for (int i = 0; i < STAR_COUNT; i++)
 		{
@@ -160,11 +228,14 @@ int main(int argc, char* argv[])
 
 			if (abs((int)star.x) > WIDTH / 2 && abs((int)star.y) > HEIGHT / 2)
 			{
-				stars[i] = NewStar(mouseX, mouseY);
+				stars[i] = NewStar(aimX, aimY);
 			}
 		}
 
-		printf("MouseX: %d, MouseY: %d\n", mouseX, mouseY);
+		orange.DrawPlanet(aimX, aimY);
+		/*blue.DrawPlanet(aimX, aimY);
+		white.DrawPlanet(aimX, aimY);*/
+		printf("AimX: %d, AimY: %d\n", aimX, aimY);
 
 		SDL_UpdateWindowSurface(window);
 		SDL_Delay(16);
