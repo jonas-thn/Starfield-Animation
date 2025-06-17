@@ -23,5 +23,8 @@
     <ClInclude Include="planet.h">
       <Filter>Quelldateien</Filter>
     </ClInclude>
+    <ClInclude Include="sun.h">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

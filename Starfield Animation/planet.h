@@ -24,29 +24,7 @@ public:
 		this->posY = startY;
 	}
 
-	int IsNear(double a, double b, double epsilon)
-	{
-		return fabs(a - b) < epsilon;
-	}
-
-	void DrawCircle(SDL_Surface* surface, int centerX, int centerY, int radius, Uint32 color)
-	{
-		for (int w = 0; w < radius * 2; w++)
-		{
-			for (int h = 0; h < radius * 2; h++)
-			{
-				int dx = radius - w;
-				int dy = radius - h;
-				if ((dx * dx + dy * dy) <= (radius * radius))
-				{
-					SDL_Rect rect = { WIDTH / 2 + centerX + dx, HEIGHT / 2 + centerY + dy, 1, 1 };
-					SDL_FillRect(surface, &rect, color);
-				}
-			}
-		}
-	}
-
-	void DrawPlanet(int aimX, int aimY)
+	void Draw(int aimX, int aimY)
 	{
 		way += speed;
 		way = Clamp(way, min, max);
@@ -89,5 +67,27 @@ private:
 		if (value < min) return min;
 		if (value > max) return max;
 		return value;
+	}
+
+	int IsNear(double a, double b, double epsilon)
+	{
+		return fabs(a - b) < epsilon;
+	}
+
+	void DrawCircle(SDL_Surface* surface, int centerX, int centerY, int radius, Uint32 color)
+	{
+		for (int w = 0; w < radius * 2; w++)
+		{
+			for (int h = 0; h < radius * 2; h++)
+			{
+				int dx = radius - w;
+				int dy = radius - h;
+				if ((dx * dx + dy * dy) <= (radius * radius))
+				{
+					SDL_Rect rect = { WIDTH / 2 + centerX + dx, HEIGHT / 2 + centerY + dy, 1, 1 };
+					SDL_FillRect(surface, &rect, color);
+				}
+			}
+		}
 	}
 };

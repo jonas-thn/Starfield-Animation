@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "planet.h"
+#include "sun.h"
 
 // alpha, r, g, b
 #define COLOR_WHITE 0xFFFFFFFF
@@ -128,7 +129,7 @@ int main(int argc, char* argv[])
 	int aimX = 0;
 	int aimY = 0;
 
-	Planet orange = Planet(0.1, 5, 200, 200, 200, surface, COLOR_ORANGE);
+	Sun::Create(0, 0, COLOR_ORANGE, 100, 0.01);
 	Planet white = Planet(0.2, 10, 200, -300, -250, surface, COLOR_WHITE);
 	Planet blue = Planet(0.05, 1, 200, -50, 0, surface, COLOR_BLUE);
 
@@ -233,9 +234,9 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		orange.DrawPlanet(aimX, aimY);
-		blue.DrawPlanet(aimX, aimY);
-		white.DrawPlanet(aimX, aimY);
+		Sun::Draw(aimX, aimY, surface);
+		blue.Draw(aimX, aimY);
+		white.Draw(aimX, aimY);
 		printf("AimX: %d, AimY: %d\n", aimX, aimY);
 
 		SDL_UpdateWindowSurface(window);
