@@ -5,9 +5,10 @@
 #include <time.h>
 #include "planet.h"
 
+// alpha, r, g, b
 #define COLOR_WHITE 0xFFFFFFFF
-#define COLOR_ORANGE 0xFFFF00FF
-#define COLOR_BLUE 0x0000FFFF
+#define COLOR_BLUE 0xFF0000FF
+#define COLOR_ORANGE 0xFFFFAA00
 #define WIDTH 800
 #define HEIGHT 600
 #define STAR_COUNT 1000
@@ -233,8 +234,8 @@ int main(int argc, char* argv[])
 		}
 
 		orange.DrawPlanet(aimX, aimY);
-		/*blue.DrawPlanet(aimX, aimY);
-		white.DrawPlanet(aimX, aimY);*/
+		blue.DrawPlanet(aimX, aimY);
+		white.DrawPlanet(aimX, aimY);
 		printf("AimX: %d, AimY: %d\n", aimX, aimY);
 
 		SDL_UpdateWindowSurface(window);

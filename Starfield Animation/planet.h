@@ -20,6 +20,8 @@ public:
 		this->surface = surface;
 		this->color = color;
 		this->draw = 1;
+		this->posX = startX;
+		this->posY = startY;
 	}
 
 	int IsNear(double a, double b, double epsilon)
@@ -49,9 +51,6 @@ public:
 		way += speed;
 		way = Clamp(way, min, max);
 
-		static int posX = startX;
-		static int posY = startY;
-
 		double speedFactor = 0.001;
 
 		if (IsNear(way, max, 1))
@@ -68,8 +67,8 @@ public:
 			return;
 		}
 
-		posX -= aimX * speed * way * speedFactor;
-		posY -= aimY * speed * way * speedFactor;
+		posX -= (int)((double)aimX * speed * way * speedFactor);
+		posY -= (int)((double)aimY * speed * way * speedFactor);
 
 		DrawCircle(surface, posX, posY, (int)way, color);
 	}
@@ -82,6 +81,8 @@ private:
 	Uint32 color;
 	double way;
 	int draw;
+	int posX;
+	int posY;
 
 	double Clamp(double value, double min, double max)
 	{
