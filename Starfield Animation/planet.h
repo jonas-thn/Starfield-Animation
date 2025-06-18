@@ -76,6 +76,11 @@ private:
 		return fabs(a - b) < epsilon;
 	}
 
+	double Max(double a, double b)
+	{
+		return (a > b) ? a : b;
+	}
+
 	void DrawCircle(SDL_Surface* surface, int centerX, int centerY, int radius, Uint32 color)
 	{
 		for (int w = 0; w < radius * 2; w++)
@@ -91,20 +96,18 @@ private:
 
 					SDL_Rect rect = { WIDTH / 2 + pixelX, HEIGHT / 2 + pixelY, 1, 1 };
 
-					double distancePixelSunSquared = (Sun::posX - pixelX) * (Sun::posX - pixelX) + (Sun::posY - pixelY) * (Sun::posY - pixelY);
-					double distanceCenterSunSquared = (Sun::posX - centerX) * (Sun::posX - centerX) + (Sun::posY - centerY) * (Sun::posY - centerY);
-					if (distancePixelSunSquared < distanceCenterSunSquared)
-					{
-						double distanceToCenterNormalized = sqrt((centerX - pixelX) * (centerX - pixelX) + (centerY - pixelY) * (centerY - pixelY)) / radius;
+					double distancePixelSun = sqrt((Sun::posX - pixelX) * (Sun::posX - pixelX) + (Sun::posY - pixelY) * (Sun::posY - pixelY));
+					double distanceCenterSun = sqrt((Sun::posX - centerX) * (Sun::posX - centerX) + (Sun::posY - centerY) * (Sun::posY - centerY));
 
-						Uint32 colorN = InterpolateColor(color, COLOR_SUN, distanceToCenterNormalized);
+					double maxDist = distanceCenterSun + radius;
+					double minDist = Max(0.0, distanceCenterSun - radius);
 
-						SDL_FillRect(surface, &rect, colorN);
-					}
-					else
-					{
-						SDL_FillRect(surface, &rect, color);
-					}
+					double normalizedDistance = 1 - (distancePixelSun - minDist) / (maxDist - minDist);
+
+					Uint32 colorShadow = InterpolateColor(0x00000000, color, normalizedDistance);
+
+					SDL_FillRect(surface, &rect, colorShadow);
+					
 				}
 			}
 		}

@@ -6,6 +6,11 @@
 #include "planet.h"
 #include "sun.h"
 
+//TODO:
+//sorting planets
+//respawn plants
+//clamping position
+
 // alpha, r, g, b
 #define COLOR_WHITE 0xFFFFFFFF
 #define COLOR_BROWN 0xFFA52A2A
@@ -79,7 +84,7 @@ double Clamp(double value, double min, double max)
 
 Star NewStar(int mouseX, int mouseY)
 {
-	int radius = RandomRange(10, 100);
+	int radius = RandomRange(50, 100);
 	double x = RandomRange(-radius, radius) + mouseX;
 	double y = RandomRange(-radius, radius) + mouseY;
 	double vx = x * SPEED - (mouseX * 0.01);
