@@ -26,6 +26,9 @@ public:
 		posX -= (int)((double)aimX * speed);
 		posY -= (int)((double)aimY * speed);
 
+		posX = ClampInt(posX, -WIDTH/2 - radius - 20, WIDTH/2 + radius + 20);
+		posY = ClampInt(posY, -HEIGHT/2 - radius - 10, HEIGHT/2 + radius + 10);
+
 		DrawCircle(surface, posX, posY, radius, color);
 	}
 
@@ -84,5 +87,12 @@ private:
 		Uint8 b = (Uint8)((1.0 - t) * b1 + t * b2);
 
 		return (a << 24) | (r << 16) | (g << 8) | b;
+	}
+
+	static int ClampInt(int value, int min, int max)
+	{
+		if (value < min) return min;
+		if (value > max) return max;
+		return value;
 	}
 };

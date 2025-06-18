@@ -11,6 +11,8 @@
 class Planet
 {
 public:
+	Planet() = default;
+
 	Planet(double speed, int min, int max, int startX, int startY, SDL_Surface* surface, Uint32 color)
 	{
 		this->way = min;
@@ -50,7 +52,15 @@ public:
 		posX -= (int)((double)aimX * speed * way * speedFactor);
 		posY -= (int)((double)aimY * speed * way * speedFactor);
 
+		posX = ClampInt(posX, -WIDTH / 2 - max - 20, WIDTH / 2 + max + 20);
+		posY = ClampInt(posY, -HEIGHT / 2 - max - 10, HEIGHT / 2 + max + 10);
+
 		DrawCircle(surface, posX, posY, (int)way, color);
+	}
+
+	int GetDraw()
+	{
+		return draw;
 	}
 
 private:
@@ -111,6 +121,13 @@ private:
 				}
 			}
 		}
+	}
+
+	int ClampInt(int value, int min, int max)
+	{
+		if (value < min) return min;
+		if (value > max) return max;
+		return value;
 	}
 
 	Uint32 InterpolateColor(Uint32 color1, Uint32 color2, double t)

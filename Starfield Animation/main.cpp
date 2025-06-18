@@ -5,17 +5,16 @@
 #include <time.h>
 #include "planet.h"
 #include "sun.h"
-
-//TODO:
-//sorting planets
-//respawn plants
-//clamping position
+#include <vector>
 
 // alpha, r, g, b
 #define COLOR_WHITE 0xFFFFFFFF
 #define COLOR_BROWN 0xFFA52A2A
 #define COLOR_BLUE 0xFF0000FF
 #define COLOR_ORANGE 0xFFFFAA00
+#define COLOR_PURPLE 0xFF800080
+#define COLOR_GRAY 0xFF808080
+#define COLOR_GREEN 0xFF00FF00
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -33,6 +32,20 @@ typedef struct
 
 int ClampInt(int value, int min, int max);
 double Clamp(double value, double min, double max);
+
+Uint32 SelectRandomColor()
+{
+	Uint32 colors[] = {
+		COLOR_BROWN,
+		COLOR_BLUE,
+		COLOR_PURPLE,
+		COLOR_GRAY,
+		COLOR_GREEN
+	};
+
+	int r = rand() % 5;
+	return colors[r];
+}
 
 int IsNear(double a, double b, double epsilon)
 {
@@ -128,9 +141,16 @@ int main(int argc, char* argv[])
 	int aimX = 0;
 	int aimY = 0;
 
-	Sun::Create(0, 0, COLOR_ORANGE, 100, 0.01);
+	Sun::Create(0, 0, COLOR_ORANGE, 100, 0.005);
+	std::vector<Planet> planets(5);
+
+	for(int i = 0; i < planets.size(); i++)
+	{
+		planets[i] = Planet(RandomRange(0.05, 0.2), 1, RandomRange(200, 300), RandomRange(-WIDTH / 2, WIDTH / 2), RandomRange(-HEIGHT, HEIGHT), surface, SelectRandomColor());
+	}
+
 	Planet brown = Planet(0.2, 10, 200, -300, -250, surface, COLOR_BROWN);
-	Planet blue = Planet(0.05, 1, 200, -50, 0, surface, COLOR_BLUE);
+	Planet blue = Planet(0.1, 1, 200, -50, 0, surface, COLOR_BLUE);
 
 	for (int i = 0; i < STAR_COUNT; i++)
 	{
@@ -234,8 +254,17 @@ int main(int argc, char* argv[])
 		}
 
 		Sun::Draw(aimX, aimY, surface);
-		blue.Draw(aimX, aimY);
-		brown.Draw(aimX, aimY);
+
+		for(int i = 0; i < planets.size(); i++)
+		{
+			if (planets[i].GetDraw() == 0)
+			{
+				planets[i] = Planet(RandomRange(0.05, 0.2), 1, RandomRange(200, 300), RandomRange(-WIDTH / 2, WIDTH / 2), RandomRange(-HEIGHT, HEIGHT), surface, SelectRandomColor());
+			}
+
+			planets[i].Draw(aimX, aimY);
+		}
+		
 		printf("AimX: %d, AimY: %d\n", aimX, aimY);
 
 		SDL_UpdateWindowSurface(window);
