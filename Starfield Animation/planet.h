@@ -4,8 +4,8 @@
 #include <SDL.h>
 #include "sun.h"
 
-#define WIDTH 800
-#define HEIGHT 600
+#include "utility.h"
+
 #define COLOR_SUN 0xFFFFCC88
 
 class Planet
@@ -13,7 +13,7 @@ class Planet
 public:
 	Planet() = default;
 
-	Planet(double speed, int min, int max, int startX, int startY, SDL_Surface* surface, Uint32 color)
+	Planet(double speed, int min, int max, int startX, int startY, Uint32 color)
 	{
 		this->way = min;
 		this->speed = speed;
@@ -21,14 +21,13 @@ public:
 		this->max = max;
 		this->startX = startX;
 		this->startY = startY;
-		this->surface = surface;
 		this->color = color;
 		this->draw = 1;
 		this->posX = startX;
 		this->posY = startY;
 	}
 
-	void Draw(int aimX, int aimY)
+	void Draw(int aimX, int aimY, SDL_Surface* surface)
 	{
 		way += speed;
 		way = Clamp(way, min, max);
@@ -55,7 +54,7 @@ public:
 		posX = ClampInt(posX, -WIDTH / 2 - max - 20, WIDTH / 2 + max + 20);
 		posY = ClampInt(posY, -HEIGHT / 2 - max - 10, HEIGHT / 2 + max + 10);
 
-		DrawCircle(surface, posX, posY, (int)way, color);
+		DrawCircle(surface, posX, posY, (int)way);
 	}
 
 	int GetDraw()
@@ -67,31 +66,12 @@ private:
 	double speed;
 	int min, max; 
 	int startX, startY; 
-	SDL_Surface* surface;
 	Uint32 color;
 	double way;
 	int draw;
-	int posX;
-	int posY;
+	int posX, posY;
 
-	double Clamp(double value, double min, double max)
-	{
-		if (value < min) return min;
-		if (value > max) return max;
-		return value;
-	}
-
-	int IsNear(double a, double b, double epsilon)
-	{
-		return fabs(a - b) < epsilon;
-	}
-
-	double Max(double a, double b)
-	{
-		return (a > b) ? a : b;
-	}
-
-	void DrawCircle(SDL_Surface* surface, int centerX, int centerY, int radius, Uint32 color)
+	void DrawCircle(SDL_Surface* surface, int centerX, int centerY, int radius)
 	{
 		for (int w = 0; w < radius * 2; w++)
 		{
@@ -123,33 +103,4 @@ private:
 		}
 	}
 
-	int ClampInt(int value, int min, int max)
-	{
-		if (value < min) return min;
-		if (value > max) return max;
-		return value;
-	}
-
-	Uint32 InterpolateColor(Uint32 color1, Uint32 color2, double t)
-	{
-		if (t < 0.0) t = 0.0;
-		if (t > 1.0) t = 1.0;
-
-		Uint8 a1 = (color1 >> 24) & 0xFF;
-		Uint8 r1 = (color1 >> 16) & 0xFF;
-		Uint8 g1 = (color1 >> 8) & 0xFF;
-		Uint8 b1 = (color1 >> 0) & 0xFF;
-
-		Uint8 a2 = (color2 >> 24) & 0xFF;
-		Uint8 r2 = (color2 >> 16) & 0xFF;
-		Uint8 g2 = (color2 >> 8) & 0xFF;
-		Uint8 b2 = (color2 >> 0) & 0xFF;
-
-		Uint8 a = (Uint8)((1.0 - t) * a1 + t * a2);
-		Uint8 r = (Uint8)((1.0 - t) * r1 + t * r2);
-		Uint8 g = (Uint8)((1.0 - t) * g1 + t * g2);
-		Uint8 b = (Uint8)((1.0 - t) * b1 + t * b2);
-
-		return (a << 24) | (r << 16) | (g << 8) | b;
-	}
 };

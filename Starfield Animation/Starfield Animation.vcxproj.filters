@@ -26,5 +26,8 @@
     <ClInclude Include="sun.h">
       <Filter>Quelldateien</Filter>
     </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

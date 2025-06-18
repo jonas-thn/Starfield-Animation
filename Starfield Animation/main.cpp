@@ -7,17 +7,8 @@
 #include "sun.h"
 #include <vector>
 
-// alpha, r, g, b
-#define COLOR_WHITE 0xFFFFFFFF
-#define COLOR_BROWN 0xFFA52A2A
-#define COLOR_BLUE 0xFF0000FF
-#define COLOR_ORANGE 0xFFFFAA00
-#define COLOR_PURPLE 0xFF800080
-#define COLOR_GRAY 0xFF808080
-#define COLOR_GREEN 0xFF00FF00
+#include "utility.h"
 
-#define WIDTH 800
-#define HEIGHT 600
 #define STAR_COUNT 1000
 #define SPEED 0.01
 #define ACC 0.1
@@ -29,71 +20,6 @@ typedef struct
 	double speedFactor;
 	double distance;
 } Star;
-
-int ClampInt(int value, int min, int max);
-double Clamp(double value, double min, double max);
-
-Uint32 SelectRandomColor()
-{
-	Uint32 colors[] = {
-		COLOR_BROWN,
-		COLOR_BLUE,
-		COLOR_PURPLE,
-		COLOR_GRAY,
-		COLOR_GREEN
-	};
-
-	int r = rand() % 5;
-	return colors[r];
-}
-
-int IsNear(double a, double b, double epsilon)
-{
-	return fabs(a - b) < epsilon;
-}
-
-void RandomPositionOnEdge(int& pointX, int& pointY)
-{
-	int edge = rand() % 4; 
-
-	switch (edge) {
-	case 0: // Top
-		pointX = rand() % WIDTH;
-		pointY = 0;
-		break;
-	case 1: // Bottom
-		pointX = rand() % WIDTH;
-		pointY = HEIGHT - 1;
-		break;
-	case 2: // Left
-		pointX = 0;
-		pointY = rand() % HEIGHT;
-		break;
-	case 3: // Right
-		pointX = WIDTH - 1;
-		pointY = rand() % HEIGHT;
-		break;
-	}
-}
-
-double RandomRange(double min, double max)
-{
-	return min + ((double)rand() / RAND_MAX) * (max - min);
-}
-
-int ClampInt(int value, int min, int max)
-{
-	if (value < min) return min;
-	if (value > max) return max;
-	return value;
-}
-
-double Clamp(double value, double min, double max)
-{
-	if (value < min) return min;
-	if (value > max) return max;
-	return value;
-}
 
 Star NewStar(int mouseX, int mouseY)
 {
@@ -108,7 +34,7 @@ Star NewStar(int mouseX, int mouseY)
 }
 
 
-void Update(SDL_Surface* surface, Star* stars, int mouseX, int mouseY)
+void DrawStars(SDL_Surface* surface, Star* stars, int mouseX, int mouseY)
 {
 	for(int i = 0; i < STAR_COUNT; i++)
 	{
@@ -142,15 +68,12 @@ int main(int argc, char* argv[])
 	int aimY = 0;
 
 	Sun::Create(0, 0, COLOR_ORANGE, 100, 0.005);
-	std::vector<Planet> planets(5);
+	std::vector<Planet> planets(4);
 
 	for(int i = 0; i < planets.size(); i++)
 	{
-		planets[i] = Planet(RandomRange(0.05, 0.2), 1, RandomRange(200, 300), RandomRange(-WIDTH / 2, WIDTH / 2), RandomRange(-HEIGHT, HEIGHT), surface, SelectRandomColor());
+		planets[i] = Planet(RandomRange(0.05, 0.2), 1, RandomRange(200, 300), RandomRange(-WIDTH / 2, WIDTH / 2), RandomRange(-HEIGHT, HEIGHT), SelectRandomColor());
 	}
-
-	Planet brown = Planet(0.2, 10, 200, -300, -250, surface, COLOR_BROWN);
-	Planet blue = Planet(0.1, 1, 200, -50, 0, surface, COLOR_BLUE);
 
 	for (int i = 0; i < STAR_COUNT; i++)
 	{
@@ -240,8 +163,9 @@ int main(int argc, char* argv[])
 
 		SDL_FillRect(surface, NULL, 0x00000000);
 
+		Sun::Draw(aimX, aimY, surface);
 
-		Update(surface, stars, aimX, aimY);
+		DrawStars(surface, stars, aimX, aimY);
 
 		for (int i = 0; i < STAR_COUNT; i++)
 		{
@@ -253,24 +177,19 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		Sun::Draw(aimX, aimY, surface);
-
 		for(int i = 0; i < planets.size(); i++)
 		{
 			if (planets[i].GetDraw() == 0)
 			{
-				planets[i] = Planet(RandomRange(0.05, 0.2), 1, RandomRange(200, 300), RandomRange(-WIDTH / 2, WIDTH / 2), RandomRange(-HEIGHT, HEIGHT), surface, SelectRandomColor());
+				planets[i] = Planet(RandomRange(0.05, 0.2), 1, RandomRange(200, 300), RandomRange(-WIDTH / 2, WIDTH / 2), RandomRange(-HEIGHT, HEIGHT), SelectRandomColor());
 			}
 
-			planets[i].Draw(aimX, aimY);
+			planets[i].Draw(aimX, aimY, surface);
 		}
 		
-		printf("AimX: %d, AimY: %d\n", aimX, aimY);
-
 		SDL_UpdateWindowSurface(window);
 		SDL_Delay(16);
 	}
-
 
 	return 0;
 }

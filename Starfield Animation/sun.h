@@ -3,8 +3,8 @@
 #include <math.h>
 #include <SDL.h>
 
-#define WIDTH 800
-#define HEIGHT 600
+#include "utility.h"
+
 #define COLOR_SUN 0xFFFFCC88
 
 class Sun
@@ -29,7 +29,7 @@ public:
 		posX = ClampInt(posX, -WIDTH/2 - radius - 20, WIDTH/2 + radius + 20);
 		posY = ClampInt(posY, -HEIGHT/2 - radius - 10, HEIGHT/2 + radius + 10);
 
-		DrawCircle(surface, posX, posY, radius, color);
+		DrawCircle(surface, posX, posY);
 	}
 
 	inline static int startX = 0;
@@ -41,7 +41,7 @@ public:
 	inline static double speed = 0;
 
 private:
-	static void DrawCircle(SDL_Surface* surface, int centerX, int centerY, int radius, Uint32 color)
+	static void DrawCircle(SDL_Surface* surface, int centerX, int centerY)
 	{
 		for (int w = 0; w < radius * 2; w++)
 		{
@@ -58,41 +58,11 @@ private:
 
 					double distanceToCenterNormalized = sqrt((centerX - pixelX) * (centerX - pixelX) + (centerY - pixelY) * (centerY - pixelY)) / radius;
 
-					Uint32 colorN = InterpolateColor(color, COLOR_SUN, distanceToCenterNormalized);
+					Uint32 colorN = InterpolateColor(0xFFFFFFFF, COLOR_SUN, distanceToCenterNormalized);
 
 					SDL_FillRect(surface, &rect, colorN);
 				}
 			}
 		}
-	}
-
-	static Uint32 InterpolateColor(Uint32 color1, Uint32 color2, double t)
-	{
-		if (t < 0.0) t = 0.0;
-		if (t > 1.0) t = 1.0;
-
-		Uint8 a1 = (color1 >> 24) & 0xFF;
-		Uint8 r1 = (color1 >> 16) & 0xFF;
-		Uint8 g1 = (color1 >> 8) & 0xFF;
-		Uint8 b1 = (color1 >> 0) & 0xFF;
-
-		Uint8 a2 = (color2 >> 24) & 0xFF;
-		Uint8 r2 = (color2 >> 16) & 0xFF;
-		Uint8 g2 = (color2 >> 8) & 0xFF;
-		Uint8 b2 = (color2 >> 0) & 0xFF;
-
-		Uint8 a = (Uint8)((1.0 - t) * a1 + t * a2);
-		Uint8 r = (Uint8)((1.0 - t) * r1 + t * r2);
-		Uint8 g = (Uint8)((1.0 - t) * g1 + t * g2);
-		Uint8 b = (Uint8)((1.0 - t) * b1 + t * b2);
-
-		return (a << 24) | (r << 16) | (g << 8) | b;
-	}
-
-	static int ClampInt(int value, int min, int max)
-	{
-		if (value < min) return min;
-		if (value > max) return max;
-		return value;
 	}
 };
